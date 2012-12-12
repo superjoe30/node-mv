@@ -54,7 +54,7 @@ function moveDirAcrossDevice(source, dest, cb) {
   stdout = [];
   child.stderr.on('data', function(data) { stderr.push(data); });
   child.stdout.on('data', function(data) { stdout.push(data); });
-  child.on('close', function(code) {
+  child.on('exit', function(code) {
     if (code === 0) {
       cb();
     } else {
