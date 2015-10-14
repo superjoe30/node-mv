@@ -4,7 +4,7 @@ Usage:
 ------
 
 ```js
-var mv = require('mv');
+var mv = require('node-mv');
 
 mv('source/file', 'dest/file', function(err) {
   // done. it tried fs.rename first, and then falls back to
