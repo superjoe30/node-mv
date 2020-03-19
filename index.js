@@ -2,7 +2,6 @@ var fs = require('fs');
 var ncp = require('ncp').ncp;
 var path = require('path');
 var rimraf = require('rimraf');
-var mkdirp = require('mkdirp');
 
 module.exports = mv;
 
@@ -11,18 +10,18 @@ function mv(source, dest, options, cb){
     cb = options;
     options = {};
   }
-  var shouldMkdirp = !!options.mkdirp;
+  var shouldMkdirRecursive = !!options.recursive;
   var clobber = options.clobber !== false;
   var limit = options.limit || 16;
 
-  if (shouldMkdirp) {
+  if (shouldMkdirRecursive) {
     mkdirs();
   } else {
     doRename();
   }
 
   function mkdirs() {
-    mkdirp(path.dirname(dest), function(err) {
+    fs.mkdir(path.dirname(dest), { recursive: true }, function(err) {
       if (err) return cb(err);
       doRename();
     });
