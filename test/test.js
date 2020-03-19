@@ -48,8 +48,8 @@ describe("mv", function() {
     });
   });
 
-  it("should create directory structure when mkdirp option set", function (done) {
-    mv("test/a-file", "test/does/not/exist/a-file-dest", {mkdirp: true}, function (err) {
+  it("should create directory structure when recursive option set", function (done) {
+    mv("test/a-file", "test/does/not/exist/a-file-dest", {recursive: true}, function (err) {
       assert.ifError(err);
       fs.readFile("test/does/not/exist/a-file-dest", 'utf8', function (err, contents) {
         assert.ifError(err);
