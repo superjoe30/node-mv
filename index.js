@@ -6,7 +6,7 @@ var mkdirp = require('mkdirp');
 
 module.exports = mv;
 
-function mv(source, dest, options, cb){
+function mv(source, dest, options, cb) {
   if (typeof options === 'function') {
     cb = options;
     options = {};
@@ -22,21 +22,25 @@ function mv(source, dest, options, cb){
   }
 
   function mkdirs() {
-    mkdirp(path.dirname(dest), function(err) {
-      if (err) return cb(err);
-      doRename();
-    });
+    mkdirp(dest)
+      .then(() => {
+        doRename();
+      })
+      .catch(err => {
+        return cb(err);
+      });
   }
+
 
   function doRename() {
     if (clobber) {
-      fs.rename(source, dest, function(err) {
+      fs.rename(source, dest, function (err) {
         if (!err) return cb();
         if (err.code !== 'EXDEV') return cb(err);
         moveFileAcrossDevice(source, dest, clobber, limit, cb);
       });
     } else {
-      fs.link(source, dest, function(err) {
+      fs.link(source, dest, function (err) {
         if (err) {
           if (err.code === 'EXDEV') {
             moveFileAcrossDevice(source, dest, clobber, limit, cb);
@@ -58,8 +62,8 @@ function mv(source, dest, options, cb){
 function moveFileAcrossDevice(source, dest, clobber, limit, cb) {
   var outFlags = clobber ? 'w' : 'wx';
   var ins = fs.createReadStream(source);
-  var outs = fs.createWriteStream(dest, {flags: outFlags});
-  ins.on('error', function(err){
+  var outs = fs.createWriteStream(dest, { flags: outFlags });
+  ins.on('error', function (err) {
     ins.destroy();
     outs.destroy();
     outs.removeListener('close', onClose);
@@ -69,7 +73,7 @@ function moveFileAcrossDevice(source, dest, clobber, limit, cb) {
       cb(err);
     }
   });
-  outs.on('error', function(err){
+  outs.on('error', function (err) {
     ins.destroy();
     outs.destroy();
     outs.removeListener('close', onClose);
@@ -77,7 +81,7 @@ function moveFileAcrossDevice(source, dest, clobber, limit, cb) {
   });
   outs.once('close', onClose);
   ins.pipe(outs);
-  function onClose(){
+  function onClose() {
     fs.unlink(source, cb);
   }
 }
@@ -89,7 +93,7 @@ function moveDirAcrossDevice(source, dest, clobber, limit, cb) {
     limit: limit,
   };
   if (clobber) {
-    rimraf(dest, { disableGlob: true }, function(err) {
+    rimraf(dest, { disableGlob: true }, function (err) {
       if (err) return cb(err);
       startNcp();
     });
@@ -97,7 +101,7 @@ function moveDirAcrossDevice(source, dest, clobber, limit, cb) {
     startNcp();
   }
   function startNcp() {
-    ncp(source, dest, options, function(errList) {
+    ncp(source, dest, options, function (errList) {
       if (errList) return cb(errList[0]);
       rimraf(source, { disableGlob: true }, cb);
     });
